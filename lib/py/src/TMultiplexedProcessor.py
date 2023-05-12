@@ -34,12 +34,16 @@ class TMultiplexedProcessor(TProcessor):
 
     index = name.find(TMultiplexedProtocol.SEPARATOR)
     if index < 0:
-      raise TException("Service name not found in message name: " + name + ". Did you forget to use TMultiplexProtocol in your client?")
+      raise TException(
+          f"Service name not found in message name: {name}. Did you forget to use TMultiplexProtocol in your client?"
+      )
 
-    serviceName = name[0:index]
+    serviceName = name[:index]
     call = name[index+len(TMultiplexedProtocol.SEPARATOR):]
-    if not serviceName in self.services:
-      raise TException("Service name not found: " + serviceName + ". Did you forget to call registerProcessor()?")
+    if serviceName not in self.services:
+      raise TException(
+          f"Service name not found: {serviceName}. Did you forget to call registerProcessor()?"
+      )
 
     standardMessage = (
       call,

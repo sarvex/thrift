@@ -187,7 +187,7 @@ class TestHandler:
 # set up the protocol factory form the --protocol option
 pfactory_cls = PROT_FACTORIES.get(options.proto, None)
 if pfactory_cls is None:
-  raise AssertionError('Unknown --protocol option: %s' % options.proto)
+  raise AssertionError(f'Unknown --protocol option: {options.proto}')
 pfactory = pfactory_cls()
 
 # get the server type (TSimpleServer, TNonblockingServer, etc...)
@@ -217,14 +217,12 @@ if options.ssl:
 else:
   transport = TSocket.TServerSocket(host, options.port)
 tfactory = TTransport.TBufferedTransportFactory()
-if options.trans == 'buffered':
+if options.trans == 'buffered' or options.trans not in ['framed', '']:
   tfactory = TTransport.TBufferedTransportFactory()
 elif options.trans == 'framed':
   tfactory = TTransport.TFramedTransportFactory()
-elif options.trans == '':
-  raise AssertionError('Unknown --transport option: %s' % options.trans)
 else:
-  tfactory = TTransport.TBufferedTransportFactory()
+  raise AssertionError(f'Unknown --transport option: {options.trans}')
 # if --zlib, then wrap server transport, and use a different transport factory
 if options.zlib:
   transport = TZlibTransport.TZlibTransport(transport) # wrap  with zlib

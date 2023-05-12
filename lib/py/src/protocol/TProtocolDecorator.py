@@ -35,8 +35,5 @@ class TProtocolDecorator():
     raise AttributeError(name)
 
   def _wrap(self, func, args, kwargs):
-    if type(func) == MethodType:
-      result = func(*args, **kwargs)
-    else:
-      result = func(self.protocol, *args, **kwargs)
-    return result
+    return (func(*args, **kwargs) if type(func) == MethodType else func(
+        self.protocol, *args, **kwargs))

@@ -81,37 +81,41 @@ class SimpleJSONProtocolTest(unittest.TestCase):
       self._assertDictEqual(expected, actual)
      
   def testComplicated(self):
-      v2obj = VersioningTestV2(
-          begin_in_both=12345,
-          newint=1,
-          newbyte=2,
-          newshort=3,
-          newlong=4,
-          newdouble=5.0,
-          newstruct=Bonk(message="Hello!", type=123),
-          newlist=[7,8,9],
-          newset=set([42,1,8]),
-          newmap={1:2,2:3},
-          newstring="Hola!",
-          end_in_both=54321)
-      expected = dict(begin_in_both=v2obj.begin_in_both,
-                      newint=v2obj.newint,
-                      newbyte=v2obj.newbyte,
-                      newshort=v2obj.newshort,
-                      newlong=v2obj.newlong,
-                      newdouble=v2obj.newdouble,
-                      newstruct=dict(message=v2obj.newstruct.message,
-                                     type=v2obj.newstruct.type),
-                      newlist=v2obj.newlist,
-                      newset=list(v2obj.newset),
-                      newmap=v2obj.newmap,
-                      newstring=v2obj.newstring,
-                      end_in_both=v2obj.end_in_both)
-      
-      # Need to load/dump because map keys get escaped.
-      expected = json.loads(json.dumps(expected))
-      actual = json.loads(self._serialize(v2obj))
-      self._assertDictEqual(expected, actual)
+    v2obj = VersioningTestV2(
+        begin_in_both=12345,
+        newint=1,
+        newbyte=2,
+        newshort=3,
+        newlong=4,
+        newdouble=5.0,
+        newstruct=Bonk(message="Hello!", type=123),
+        newlist=[7, 8, 9],
+        newset={42, 1, 8},
+        newmap={
+            1: 2,
+            2: 3
+        },
+        newstring="Hola!",
+        end_in_both=54321,
+    )
+    expected = dict(begin_in_both=v2obj.begin_in_both,
+                    newint=v2obj.newint,
+                    newbyte=v2obj.newbyte,
+                    newshort=v2obj.newshort,
+                    newlong=v2obj.newlong,
+                    newdouble=v2obj.newdouble,
+                    newstruct=dict(message=v2obj.newstruct.message,
+                                   type=v2obj.newstruct.type),
+                    newlist=v2obj.newlist,
+                    newset=list(v2obj.newset),
+                    newmap=v2obj.newmap,
+                    newstring=v2obj.newstring,
+                    end_in_both=v2obj.end_in_both)
+
+    # Need to load/dump because map keys get escaped.
+    expected = json.loads(json.dumps(expected))
+    actual = json.loads(self._serialize(v2obj))
+    self._assertDictEqual(expected, actual)
 
 
 if __name__ == '__main__':

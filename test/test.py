@@ -48,14 +48,8 @@ parser.add_option("--client", type="string", dest="clients", default="",
 parser.set_defaults(verbose=1)
 options, args = parser.parse_args()
 
-if options.servers == "":
-  serversList = []
-else:
-  serversList = options.servers.split(",")
-if options.clients == "":
-  clientsList = []
-else:
-  clientsList = options.clients.split(",")
+serversList = [] if options.servers == "" else options.servers.split(",")
+clientsList = [] if options.clients == "" else options.clients.split(",")
 
 def relfile(fname):
     return os.path.join(os.path.dirname(__file__), fname)

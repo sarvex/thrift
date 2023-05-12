@@ -33,7 +33,7 @@ class TBase(object):
   def __repr__(self):
     L = ['%s=%r' % (key, getattr(self, key))
               for key in self.__slots__]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+    return f"{self.__class__.__name__}({', '.join(L)})"
 
   def __eq__(self, other):
     if not isinstance(other, self.__class__):

@@ -69,7 +69,7 @@ class TMessageType:
 class TProcessor:
   """Base class for procsessor, which works on two streams."""
 
-  def process(iprot, oprot):
+  def process(self, oprot):
     pass
 
 
@@ -141,18 +141,12 @@ class TApplicationException(TException):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.STRING:
-          self.message = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.I32:
-          self.type = iprot.readI32()
-        else:
-          iprot.skip(ftype)
-      else:
+      if fid == 1 and ftype == TType.STRING:
+        self.message = iprot.readString()
+      elif fid == 1 or fid == 2 and ftype != TType.I32 or fid != 2:
         iprot.skip(ftype)
+      else:
+        self.type = iprot.readI32()
       iprot.readFieldEnd()
     iprot.readStructEnd()
 

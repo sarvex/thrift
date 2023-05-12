@@ -23,7 +23,7 @@ from SCons.Builder import Builder
 
 def scons_env(env, add=''):
   opath = path.dirname(path.abspath('$TARGET'))
-  lstr = 'thrift --gen cpp -o ' + opath + ' ' + add + ' $SOURCE'
+  lstr = f'thrift --gen cpp -o {opath} {add} $SOURCE'
   cppbuild = Builder(action=lstr)
   env.Append(BUILDERS={'ThriftCpp': cppbuild})
 
@@ -31,5 +31,5 @@ def scons_env(env, add=''):
 def gen_cpp(env, dir, file):
   scons_env(env)
   suffixes = ['_types.h', '_types.cpp']
-  targets = map(lambda s: 'gen-cpp/' + file + s, suffixes)
+  targets = map(lambda s: f'gen-cpp/{file}{s}', suffixes)
   return env.ThriftCpp(targets, dir + file + '.thrift')

@@ -47,9 +47,7 @@ class FacebookBase(FacebookService.Iface):
     self.counters[key] = 0
 
   def getCounter(self, key):
-    if self.counters.has_key(key):
-      return self.counters[key]
-    return 0
+    return self.counters[key] if self.counters.has_key(key) else 0
 
   def incrementCounter(self, key):
     self.counters[key] = self.getCounter(key) + 1

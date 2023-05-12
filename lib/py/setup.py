@@ -68,8 +68,8 @@ def run_setup(with_binary):
             cmdclass=dict(build_ext=ve_build_ext)
         )
     else:
-        extensions = dict()
-        
+        extensions = {}
+
     setup(name = 'thrift',
         version = '1.0.0-dev',
         description = 'Python bindings for the Apache Thrift RPC system',

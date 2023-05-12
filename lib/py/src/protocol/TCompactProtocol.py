@@ -226,10 +226,7 @@ class TCompactProtocol(TProtocolBase):
 
   def writeBool(self, bool):
     if self.state == BOOL_WRITE:
-      if bool:
-        ctype = CompactType.TRUE
-      else:
-        ctype = CompactType.FALSE
+      ctype = CompactType.TRUE if bool else CompactType.FALSE
       self.__writeFieldHeader(ctype, self.__bool_fid)
     elif self.state == CONTAINER_WRITE:
       if bool:
@@ -265,10 +262,7 @@ class TCompactProtocol(TProtocolBase):
     if type & 0x0f == TType.STOP:
       return (None, 0, 0)
     delta = type >> 4
-    if delta == 0:
-      fid = self.__readI16()
-    else:
-      fid = self.__last_fid + delta
+    fid = self.__readI16() if delta == 0 else self.__last_fid + delta
     self.__last_fid = fid
     type = type & 0x0f
     if type == CompactType.TRUE:
@@ -351,9 +345,7 @@ class TCompactProtocol(TProtocolBase):
   def readMapBegin(self):
     assert self.state in (VALUE_READ, CONTAINER_READ), self.state
     size = self.__readSize()
-    types = 0
-    if size > 0:
-      types = self.__readUByte()
+    types = self.__readUByte() if size > 0 else 0
     vtype = self.__getTType(types)
     ktype = self.__getTType(types >> 4)
     self.__containers.append(self.state)

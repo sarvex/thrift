@@ -92,7 +92,7 @@ class TTornadoStreamTransport(TTransportBase):
             else:
                 yield connect
         except (socket.error, IOError, ioloop.TimeoutError) as e:
-            message = 'could not connect to {}:{} ({})'.format(self.host, self.port, e)
+            message = f'could not connect to {self.host}:{self.port} ({e})'
             raise TTransportException(
                 type=TTransportException.NOT_OPEN,
                 message=message)

@@ -204,9 +204,7 @@ class TZlibTransport(TTransportBase, CReadableTransport):
     self.bytes_in_comp += len(buf)
     old = self.__rbuf.read()
     self.__rbuf = StringIO(old + buf)
-    if len(old) + len(buf) == 0:
-      return False
-    return True
+    return len(old) + len(buf) != 0
 
   def write(self, buf):
     """Write some bytes, putting them into the internal write

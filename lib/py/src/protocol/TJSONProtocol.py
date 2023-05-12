@@ -57,9 +57,7 @@ CTYPES = {TType.BOOL:       'tf',
           TType.SET:        'set',
           TType.MAP:        'map'}
 
-JTYPES = {}
-for key in CTYPES.keys():
-  JTYPES[CTYPES[key]] = key
+JTYPES = {CTYPES[key]: key for key in CTYPES}
 
 
 class JSONBaseContext(object):
@@ -123,7 +121,7 @@ class JSONPairContext(JSONBaseContext):
     return self.colon
 
   def __str__(self):
-    return '%s, colon=%s' % (self.__class__.__name__, self.colon)
+    return f'{self.__class__.__name__}, colon={self.colon}'
 
 
 class LookaheadReader():
@@ -180,7 +178,7 @@ class TJSONProtocolBase(TProtocolBase):
     self.context.write()
     jsNumber = str(number)
     if self.context.escapeNum():
-      jsNumber = "%s%s%s" % (QUOTE, jsNumber,  QUOTE)
+      jsNumber = f"{QUOTE}{jsNumber}{QUOTE}"
     self.trans.write(jsNumber)
 
   def writeJSONBase64(self, binary):
@@ -211,7 +209,7 @@ class TJSONProtocolBase(TProtocolBase):
     current = self.reader.read()
     if character != current:
       raise TProtocolException(TProtocolException.INVALID_DATA,
-                               "Unexpected character: %s" % current)
+                               f"Unexpected character: {current}")
 
   def readJSONString(self, skipContext):
     string = []
@@ -238,7 +236,7 @@ class TJSONProtocolBase(TProtocolBase):
     return ''.join(string)
 
   def isJSONNumeric(self, character):
-    return (True if NUMERIC_CHAR.find(character) != - 1 else False)
+    return NUMERIC_CHAR.find(character) != - 1
 
   def readJSONQuotes(self):
     if (self.context.escapeNum()):
@@ -374,7 +372,7 @@ class TJSONProtocol(TJSONProtocolBase):
   readListEnd = readCollectionEnd
 
   def readBool(self):
-    return (False if self.readJSONInteger() == 0 else True)
+    return self.readJSONInteger() != 0
 
   def readNumber(self):
     return self.readJSONInteger()

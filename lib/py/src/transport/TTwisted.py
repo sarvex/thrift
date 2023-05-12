@@ -65,11 +65,7 @@ class ThriftClientProtocol(basic.Int32StringReceiver):
     def __init__(self, client_class, iprot_factory, oprot_factory=None):
         self._client_class = client_class
         self._iprot_factory = iprot_factory
-        if oprot_factory is None:
-            self._oprot_factory = iprot_factory
-        else:
-            self._oprot_factory = oprot_factory
-
+        self._oprot_factory = iprot_factory if oprot_factory is None else oprot_factory
         self.recv_map = {}
         self.started = defer.Deferred()
 
@@ -96,7 +92,7 @@ class ThriftClientProtocol(basic.Int32StringReceiver):
         try:
             method = self.recv_map[fname]
         except KeyError:
-            method = getattr(self.client, 'recv_' + fname)
+            method = getattr(self.client, f'recv_{fname}')
             self.recv_map[fname] = method
 
         method(iprot, mtype, rseqid)
@@ -155,12 +151,11 @@ class ThriftSASLClientProtocol(ThriftClientProtocol):
                 response = yield deferToThread(self.sasl.process, challenge)
                 self._sendSASLMessage(self.OK, response)
             elif status == self.COMPLETE:
-                if not self.sasl.complete:
-                    msg = "The server erroneously indicated that SASL " \
-                          "negotiation was complete"
-                    raise TTransport.TTransportException(msg, message=msg)
-                else:
+                if self.sasl.complete:
                     break
+                msg = "The server erroneously indicated that SASL " \
+                          "negotiation was complete"
+                raise TTransport.TTransportException(msg, message=msg)
             else:
                 msg = "Bad SASL negotiation status: %d (%s)" % (status, challenge)
                 raise TTransport.TTransportException(msg, message=msg)
@@ -259,10 +254,7 @@ class ThriftServerFactory(ServerFactory):
     def __init__(self, processor, iprot_factory, oprot_factory=None):
         self.processor = processor
         self.iprot_factory = iprot_factory
-        if oprot_factory is None:
-            self.oprot_factory = iprot_factory
-        else:
-            self.oprot_factory = oprot_factory
+        self.oprot_factory = iprot_factory if oprot_factory is None else oprot_factory
 
 
 class ThriftClientFactory(ClientFactory):
@@ -274,10 +266,7 @@ class ThriftClientFactory(ClientFactory):
     def __init__(self, client_class, iprot_factory, oprot_factory=None):
         self.client_class = client_class
         self.iprot_factory = iprot_factory
-        if oprot_factory is None:
-            self.oprot_factory = iprot_factory
-        else:
-            self.oprot_factory = oprot_factory
+        self.oprot_factory = iprot_factory if oprot_factory is None else oprot_factory
 
     def buildProtocol(self, addr):
         p = self.protocol(self.client_class, self.iprot_factory,

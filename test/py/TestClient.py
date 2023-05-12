@@ -83,7 +83,7 @@ class AbstractTest(unittest.TestCase):
       elif options.trans == 'buffered':
         self.transport = TTransport.TBufferedTransport(socket)
       elif options.trans == '':
-        raise AssertionError('Unknown --transport option: %s' % options.trans)
+        raise AssertionError(f'Unknown --transport option: {options.trans}')
       if options.zlib:
         self.transport = TZlibTransport.TZlibTransport(self.transport, 9)
     self.transport.open()
@@ -142,7 +142,7 @@ class AbstractTest(unittest.TestCase):
     self.assertEqual(y, x)
 
   def testSet(self):
-    x = set([8, 1, 42])
+    x = {8, 1, 42}
     y = self.client.testSet(x)
     self.assertEqual(y, x)
 
@@ -225,25 +225,23 @@ class AcceleratedBinaryTest(AbstractTest):
 def suite():
   suite = unittest.TestSuite()
   loader = unittest.TestLoader()
-  if options.proto == 'binary': # look for --proto on cmdline
-    suite.addTest(loader.loadTestsFromTestCase(NormalBinaryTest))
-  elif options.proto == 'accel':
+  if options.proto == 'accel':
     suite.addTest(loader.loadTestsFromTestCase(AcceleratedBinaryTest))
+  elif options.proto == 'binary':
+    suite.addTest(loader.loadTestsFromTestCase(NormalBinaryTest))
   elif options.proto == 'compact':
     suite.addTest(loader.loadTestsFromTestCase(CompactTest))
   elif options.proto == 'json':
     suite.addTest(loader.loadTestsFromTestCase(JSONTest))
   else:
-    raise AssertionError('Unknown protocol given with --protocol: %s' % options.proto)
+    raise AssertionError(
+        f'Unknown protocol given with --protocol: {options.proto}')
   return suite
 
 class OwnArgsTestProgram(unittest.TestProgram):
     def parseArgs(self, argv):
-        if args:
-            self.testNames = args
-        else:
-            self.testNames = (self.defaultTest,)
-        self.createTests()
+      self.testNames = args if args else (self.defaultTest, )
+      self.createTests()
 
 if __name__ == "__main__":
   OwnArgsTestProgram(defaultTest="suite", testRunner=unittest.TextTestRunner(verbosity=1))

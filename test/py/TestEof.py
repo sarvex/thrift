@@ -100,7 +100,7 @@ class TestEof(unittest.TestCase):
 
     data = self.make_data(pfactory)
     for i in xrange(0, len(data) + 1):
-      trans = TTransport.TMemoryBuffer(data[0:i])
+      trans = TTransport.TMemoryBuffer(data[:i])
       prot = pfactory.getProtocol(trans)
       try:
         x = Xtruct()

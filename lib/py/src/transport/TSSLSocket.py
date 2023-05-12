@@ -69,19 +69,15 @@ class TSSLSocket(TSocket.TSocket):
     self.validate = validate
     self.is_valid = False
     self.peercert = None
-    if not validate:
-      self.cert_reqs = ssl.CERT_NONE
-    else:
-      self.cert_reqs = ssl.CERT_REQUIRED
+    self.cert_reqs = ssl.CERT_NONE if not validate else ssl.CERT_REQUIRED
     self.ca_certs = ca_certs
     self.keyfile = keyfile
     self.certfile = certfile
     self.ciphers = ciphers
-    if validate:
-      if ca_certs is None or not os.access(ca_certs, os.R_OK):
-        raise IOError('Certificate Authority ca_certs file "%s" '
-                      'is not readable, cannot validate SSL '
-                      'certificates.' % (ca_certs))
+    if validate and (ca_certs is None or not os.access(ca_certs, os.R_OK)):
+      raise IOError(
+          f'Certificate Authority ca_certs file "{ca_certs}" is not readable, cannot validate SSL certificates.'
+      )
     TSocket.TSocket.__init__(self, host, port, unix_socket)
 
   def open(self):
@@ -131,8 +127,9 @@ class TSSLSocket(TSocket.TSocket):
     self.peercert = cert
     if 'subject' not in cert:
       raise TTransportException(
-        type=TTransportException.NOT_OPEN,
-        message='No SSL certificate found from %s:%s' % (self.host, self.port))
+          type=TTransportException.NOT_OPEN,
+          message=f'No SSL certificate found from {self.host}:{self.port}',
+      )
     fields = cert['subject']
     for field in fields:
       # ensure structure we get back is what we expect
@@ -141,20 +138,18 @@ class TSSLSocket(TSocket.TSocket):
       cert_pair = field[0]
       if len(cert_pair) < 2:
         continue
-      cert_key, cert_value = cert_pair[0:2]
+      cert_key, cert_value = cert_pair[:2]
       if cert_key != 'commonName':
         continue
       certhost = cert_value
-      # this check should be performed by some sort of Access Manager
-      if certhost == self.host:
-        # success, cert commonName matches desired hostname
-        self.is_valid = True
-        return
-      else:
+      if certhost != self.host:
         raise TTransportException(
           type=TTransportException.UNKNOWN,
           message='Hostname we connected to "%s" doesn\'t match certificate '
                   'provided commonName "%s"' % (self.host, certhost))
+      # success, cert commonName matches desired hostname
+      self.is_valid = True
+      return
     raise TTransportException(
       type=TTransportException.UNKNOWN,
       message='Could not validate SSL certificate from '
@@ -204,7 +199,7 @@ class TSSLServerSocket(TSocket.TServerSocket):
     Raises an IOError exception if the certfile is not present or unreadable.
     """
     if not os.access(certfile, os.R_OK):
-      raise IOError('No such certfile found: %s' % (certfile))
+      raise IOError(f'No such certfile found: {certfile}')
     self.certfile = certfile
 
   def accept(self):
